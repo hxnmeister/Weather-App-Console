@@ -17,7 +17,7 @@ namespace Weather_App
             this.API_URL = API_URL;
         }
 
-        public void Show(string cityName, string time)
+        public void Display(string cityName, string time)
         {
             try
             {

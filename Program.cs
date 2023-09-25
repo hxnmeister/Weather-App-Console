@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Weather_App
 {
@@ -13,9 +14,11 @@ namespace Weather_App
                 {
                     string cityName = null;
                     Weather weather = new Weather();
+                    //The variable is initialized with the value null to be able to understand the user whether he wants to get a full forecast or for a certain time
                     DateTime? timeDay = null;
 
                     Console.Clear();
+                    //Returning the text color after displaying the weather
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"\n  To find out tomorrow's weather ({DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}), enter your city and time of day (leave blank to get an hourly forecast)");
 
@@ -30,6 +33,7 @@ namespace Weather_App
 
                     } while (true);
 
+                    //This check is aimed at finding out from the user what kind of summary he wants to receive, complete or accurate in time
                     do
                     {
                         Console.Write("\n Enter time(HH:mm): ");
@@ -53,7 +57,7 @@ namespace Weather_App
                     } while (true);
 
                     Console.Clear();
-                    weather.Show(cityName, timeDay?.ToString("HH:mm"));
+                    weather.Display(cityName, timeDay?.ToString("HH:mm"));
 
                     Console.Write("\n\n To exit, press \"E\", to continue, press any key\n");
                 } while (char.ToUpper(Console.ReadKey(true).KeyChar) != 'E');

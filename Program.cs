@@ -28,7 +28,7 @@ namespace Weather_App
                         cityName = Console.ReadLine();
 
                         Console.Clear();
-                        if (!(new Regex("^[a-zA-Z]{2,}$").Match(cityName).Success)) Console.WriteLine($"\n City name \"{cityName}\" is incorrect, try again!");
+                        if (!(new Regex("^[a-zA-Z -]{2,}$").Match(cityName).Success)) Console.WriteLine($"\n City name \"{cityName}\" is incorrect, try again!");
                         else break;
 
                     } while (true);
@@ -57,7 +57,7 @@ namespace Weather_App
                     } while (true);
 
                     Console.Clear();
-                    weather.Display(cityName, timeDay?.ToString("HH:mm"));
+                    weather.Display(cityName, timeDay?.ToString("HH" + ":00")) ;
 
                     Console.Write("\n\n To exit, press \"E\", to continue, press any key\n");
                 } while (char.ToUpper(Console.ReadKey(true).KeyChar) != 'E');

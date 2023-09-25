@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Xml.Linq;
 
@@ -19,7 +17,7 @@ namespace Weather_App
             this.API_URL = API_URL;
         }
 
-        public void ShowWeather(string cityName, string time)
+        public void Show(string cityName, string time)
         {
             try
             {
@@ -28,10 +26,29 @@ namespace Weather_App
 
                 WebClient receiver = new WebClient();
                 XDocument weatherData = XDocument.Parse(Encoding.UTF8.GetString(receiver.DownloadData(webEndPoint)));
-                XElement root = weatherData.Root;
-                XElement forecastDay = root.Element("forecast").Elements("forecastday").FirstOrDefault(x => x.Element("date").Value == tommorow);
+                XElement location = weatherData.Root.Element("location");
+                XElement forecastForDay = weatherData.Root.Element("forecast").Elements("forecastday").FirstOrDefault(x => x.Element("date").Value == tommorow);
 
+                Console.WriteLine($"\n  Weather for {location.Element("name").Value}, {location.Element("region").Value}, {location.Element("country").Value}");
+                Console.WriteLine($"\n  {tommorow}");
+                Console.WriteLine("  ================================");
+                Console.WriteLine($"  Max Temperature: {forecastForDay.Element("day").Element("maxtemp_c").Value}°C / {forecastForDay.Element("day").Element("maxtemp_f").Value}°F");
+                Console.WriteLine($"  Min Temperature: {forecastForDay.Element("day").Element("mintemp_c").Value}°C / {forecastForDay.Element("day").Element("mintemp_f").Value}°F");
+                Console.WriteLine($"  Max Wind Speed: {forecastForDay.Element("day").Element("maxwind_kph").Value} km/h");
+                Console.WriteLine($"  Average Visibility: {forecastForDay.Element("day").Element("avgvis_km").Value} km/h");
+                Console.WriteLine("  ================================\n\n");
 
+                if (time == null)
+                {
+                    foreach (XElement item in forecastForDay.Elements("hour"))
+                    {
+                        ShowCurrentForecast(item);
+                    }
+                }
+                else
+                {
+                    ShowCurrentForecast(forecastForDay.Elements("hour").FirstOrDefault(x => x.Element("time").Value == $"{tommorow} {time}"));
+                }
             }
             catch(WebException we)
             {
@@ -43,6 +60,34 @@ namespace Weather_App
                 Console.WriteLine("\n An exception occurred during execution!");
                 Console.WriteLine($" Exception Message: {ex.Message}\n");
             }
+        }
+
+        private void ShowCurrentForecast(XElement currentForecast)
+        {
+            bool willItRain = currentForecast.Element("will_it_rain").Value == "1";
+            bool willItSnow = currentForecast.Element("chance_of_snow").Value == "1";
+
+            Console.ForegroundColor = Console.ForegroundColor == ConsoleColor.Yellow ? ConsoleColor.Blue : ConsoleColor.Yellow;
+
+            Console.WriteLine("  ============================");
+            Console.WriteLine($"  Forecast on {currentForecast.Element("time").Value}");
+            Console.WriteLine("  ============================");
+            Console.WriteLine($"  Temperature: {currentForecast.Element("temp_c").Value}°C / {currentForecast.Element("temp_f").Value}°F");
+            Console.WriteLine($"  Feels Like: {currentForecast.Element("feelslike_c").Value}°C / {currentForecast.Element("feelslike_f").Value}°F");
+            Console.WriteLine($"  UV Index: {currentForecast.Element("uv").Value}");
+            Console.WriteLine("  --");
+            Console.WriteLine($"  Wind Speed: {currentForecast.Element("wind_kph").Value} km/h");
+            Console.WriteLine($"  Wind Direction: {currentForecast.Element("wind_dir").Value}");
+            Console.WriteLine("  --");
+            Console.WriteLine($"  Visibility: {currentForecast.Element("vis_km").Value} km/h");
+            Console.WriteLine($"  Cloudiness: {currentForecast.Element("cloud").Value}%");
+            Console.WriteLine($"  Humidity: {currentForecast.Element("humidity").Value}%");
+            Console.WriteLine("  --");
+            Console.WriteLine($"  Will It Rain: {(willItRain ? "Yes" : "No")}");
+            if (willItRain) Console.WriteLine($"  Chance Of Rain: {currentForecast.Element("chance_of_rain").Value}%");
+            Console.WriteLine($"  Will It Snow: {(currentForecast.Element("will_it_snow").Value == "1" ? "Yes" : "No")}");
+            if (willItSnow) Console.WriteLine($"  Chance Of Snow: {currentForecast.Element("chance_of_snow").Value}%");
+            Console.WriteLine("  ============================\n");
         }
     }
 }

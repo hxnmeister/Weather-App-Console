@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using System.Xml.Linq;
 using System.Text.RegularExpressions;
 
 namespace Weather_App
@@ -13,49 +7,62 @@ namespace Weather_App
     {
         static void Main(string[] args)
         {
-            string cityName = null;
-            DateTime? timeDay = null;
-
-            do
+            try
             {
-                Console.WriteLine("\n  To find out the weather, enter the city and time of day (leave the field blank to get an hourly forecast)");
-
                 do
                 {
-                    Console.Write("\n Enter city name: ");
-                    cityName = Console.ReadLine();
+                    string cityName = null;
+                    Weather weather = new Weather();
+                    DateTime? timeDay = null;
 
                     Console.Clear();
-                    if (!(new Regex("^[a-zA-Z]{2,}$").Match(cityName).Success)) Console.WriteLine($"\n City name \"{cityName}\" is incorrect, try again!");
-                    else break;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine($"\n  To find out tomorrow's weather ({DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}), enter your city and time of day (leave blank to get an hourly forecast)");
 
-                } while (true);
+                    do
+                    {
+                        Console.Write("\n Enter city name: ");
+                        cityName = Console.ReadLine();
 
-                do
-                {
-                    Console.Write("\n Enter time(HH:mm): ");
-                    string tempTime = Console.ReadLine();
+                        Console.Clear();
+                        if (!(new Regex("^[a-zA-Z]{2,}$").Match(cityName).Success)) Console.WriteLine($"\n City name \"{cityName}\" is incorrect, try again!");
+                        else break;
+
+                    } while (true);
+
+                    do
+                    {
+                        Console.Write("\n Enter time(HH:mm): ");
+                        string tempTime = Console.ReadLine();
+
+                        Console.Clear();
+                        if (string.IsNullOrWhiteSpace(tempTime))
+                        {
+                            break;
+                        }
+                        else if (DateTime.TryParse(tempTime, out DateTime result))
+                        {
+                            timeDay = result;
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"\n Entered format \"{tempTime}\" is incorrect, try again!");
+                        }
+
+                    } while (true);
 
                     Console.Clear();
-                    if (string.IsNullOrWhiteSpace(tempTime))
-                    {
-                        break;
-                    }
-                    else if (DateTime.TryParse(tempTime, out DateTime result))
-                    {
-                        timeDay = result;
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"\n Entered format \"{tempTime}\" is incorrect, try again!");
-                    }
+                    weather.Show(cityName, timeDay?.ToString("HH:mm"));
 
-                } while (true);
-
-                new Weather().ShowWeather("Sumy", timeDay?.ToString("HH:mm"));
-
-            } while (true);
+                    Console.Write("\n\n To exit, press \"E\", to continue, press any key\n");
+                } while (char.ToUpper(Console.ReadKey(true).KeyChar) != 'E');
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n An exception occurred during execution!");
+                Console.WriteLine($" Exception Message: {ex.Message}\n");
+            }
         }
     }
 }
